@@ -1,0 +1,43 @@
+<view class="container">
+  <view wx:if="{{loading && items.length === 0}}" class="state-mask">
+    <view class="spinner"></view>
+    <text class="state-text">加载中…</text>
+  </view>
+
+  <view wx:elif="{{items.length === 0}}" class="state-mask">
+    <text class="empty-icon">📝</text>
+    <text class="empty-text">还没有练习记录</text>
+    <text class="empty-hint">完成一次陪练后，这里会记录你的成长轨迹</text>
+    <view class="btn-primary small" bindtap="onGoPractice">去开始练习</view>
+  </view>
+
+  <view wx:else class="list">
+    <view
+      wx:for="{{items}}"
+      wx:key="id"
+      class="item"
+      bindtap="onItemTap"
+      data-id="{{item.id}}"
+    >
+      <view class="item-top">
+        <text class="item-title">{{item.title}}</text>
+        <view class="badge {{item.finished ? 'badge-done' : 'badge-live'}}">{{item.statusText}}</view>
+      </view>
+      <view class="item-mid">
+        <text class="item-tag" wx:if="{{item.difficultyText}}">{{item.difficultyText}}</text>
+        <view class="item-score" wx:if="{{item.score !== null}}">
+          <text class="score-label">得分</text>
+          <text class="score-num">{{item.score}}</text>
+        </view>
+      </view>
+      <view class="item-bottom">
+        <text class="item-time">{{item.timeText}}</text>
+        <text class="item-go">{{item.actionText}}</text>
+      </view>
+    </view>
+
+    <view class="load-more" bindtap="onLoadMore" wx:if="{{items.length > 0}}">
+      <text>{{hasMore ? '加载更多' : '— 没有更多了 —'}}</text>
+    </view>
+  </view>
+</view>

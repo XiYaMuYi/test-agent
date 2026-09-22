@@ -1,0 +1,34 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+import { Module } from '@nestjs/common';
+import process from 'node:process';
+import { Pool } from 'pg';
+import { IdentityModule } from '../identity/identity.module.js';
+import { SessionModule } from '../sessions/session.module.js';
+import { AssignmentController } from './assignment.controller.js';
+import { AssignmentService } from './assignment.service.js';
+const databasePoolProvider = {
+    provide: Pool,
+    useFactory: () => new Pool({ connectionString: process.env.DATABASE_URL }),
+};
+let AssignmentModule = class AssignmentModule {
+};
+AssignmentModule = __decorate([
+    Module({
+        imports: [IdentityModule, SessionModule],
+        controllers: [AssignmentController],
+        providers: [
+            databasePoolProvider,
+            {
+                provide: AssignmentService,
+                useFactory: (database) => new AssignmentService(database),
+                inject: [Pool],
+            },
+        ],
+    })
+], AssignmentModule);
+export { AssignmentModule };

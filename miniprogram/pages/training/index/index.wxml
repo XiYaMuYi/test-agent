@@ -1,0 +1,143 @@
+<view class="screen">
+  <view class="topbar">
+    <view>
+      <text class="overline">SALES LAB</text>
+      <text class="brand">陪练工作台</text>
+    </view>
+    <view class="top-action" bindtap="onHistoryTap">记录</view>
+  </view>
+
+  <view class="launch-panel">
+    <view class="launch-copy">
+      <text class="launch-kicker">今日训练</text>
+      <text class="launch-title">把下一场对话，<text class="accent">练到自然</text></text>
+      <text class="launch-desc">挑一个客户，进入真实销售情境</text>
+    </view>
+    <view class="launch-orbit"><text class="orbit-mark">AI</text></view>
+    <view class="launch-meta">
+      <text>{{selectedCardName}}</text>
+      <text class="meta-dot">·</text>
+      <text>{{selectedCardAge}}</text>
+    </view>
+    <view class="launch-button" bindtap="onStartPractice">
+      <view class="launch-button-content"><text>开始陪练</text><text class="button-arrow">→</text></view>
+    </view>
+  </view>
+
+  <!-- 团队任务：B端投放 → C端接收 -->
+  <view wx:if="{{hasAssignments}}" class="assignment-section">
+    <view class="section-heading">
+      <text class="heading-title">团队任务</text>
+      <text class="heading-note">{{assignments.length}} 个待完成</text>
+    </view>
+    <view class="assignment-list">
+      <view
+        wx:for="{{assignments}}"
+        wx:key="assignmentId"
+        class="assignment-card {{item.isCompleted ? 'assignment-done' : ''}}"
+        bindtap="onAssignmentTap"
+        data-id="{{item.assignmentId}}"
+      >
+        <view class="assignment-main">
+          <view class="assignment-title-row">
+            <text class="assignment-title">{{item.name}}</text>
+            <view wx:if="{{item.isCompleted}}" class="assignment-badge assignment-badge-done">已完成</view>
+            <view wx:else class="assignment-badge assignment-badge-active">进行中</view>
+          </view>
+          <view class="assignment-meta">
+            <text class="assignment-meta-item">剩余 {{item.remainingAttempts}}/{{item.maxAttempts}} 次</text>
+            <text class="assignment-meta-dot">·</text>
+            <text class="assignment-meta-item">截止 {{item.deadlineDisplay}}</text>
+          </view>
+        </view>
+        <view class="assignment-action">
+          <text wx:if="{{item.isCompleted}}" class="assignment-action-text">查看</text>
+          <text wx:else class="assignment-action-text">开始 →</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-heading">
+    <text class="heading-title">选择客户</text>
+    <text class="heading-note">{{cards.length}} 大人群 · 巨量 DMP</text>
+  </view>
+  <view class="cohort-grid">
+    <view
+      wx:for="{{cards}}"
+      wx:key="id"
+      class="cohort-card cohort-bg-{{index}} {{selectedCardId === item.id ? 'cohort-selected' : ''}}"
+      bindtap="onCardTap"
+      data-id="{{item.id}}"
+    >
+      <view class="cohort-emoji">{{item.emoji}}</view>
+      <text class="cohort-name">{{item.name}}</text>
+      <text class="cohort-detail">{{item.age}}岁 · {{item.occupation}}</text>
+      <text class="cohort-budget">¥{{item.consumption.budgetMin}}-{{item.consumption.budgetMax}}</text>
+      <view wx:if="{{selectedCardId === item.id}}" class="cohort-check">✓</view>
+    </view>
+    <view class="cohort-card cohort-custom" bindtap="onCustomTap">
+      <view class="cohort-emoji cohort-emoji-custom">＋</view>
+      <text class="cohort-name">自定义</text>
+      <text class="cohort-detail">精细调校画像</text>
+      <text class="cohort-budget">自由配置</text>
+    </view>
+  </view>
+
+  <view wx:if="{{templates.length}}" class="section-heading template-heading">
+    <text class="heading-title">我的模板</text>
+    <text class="heading-note">{{templates.length}} 个画像</text>
+  </view>
+  <scroll-view wx:if="{{templates.length}}" class="template-scroller" scroll-x="true" show-scrollbar="false">
+    <view class="template-track">
+      <view
+        wx:for="{{templates}}"
+        wx:key="id"
+        class="template-card"
+        bindtap="onTemplateTap"
+        data-id="{{item.id}}"
+      >
+        <text class="template-title">{{item.name}}</text>
+        <text class="template-detail">{{item.based_on_card_display || '自定义画像'}}</text>
+        <text class="template-time">{{item.updated_at_display}}</text>
+        <text class="template-arrow">›</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="tool-row">
+    <view class="tool-item" bindtap="onHistoryTap">
+      <view class="tool-icon">↗</view>
+      <view><text class="tool-title">训练记录</text><text class="tool-desc">回看评分与建议</text></view>
+      <text class="tool-arrow">›</text>
+    </view>
+    <view class="tool-item" bindtap="onCustomTap">
+      <view class="tool-icon tool-icon-muted">＋</view>
+      <view><text class="tool-title">新建模板</text><text class="tool-desc">保存专属客户画像</text></view>
+      <text class="tool-arrow">›</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading-mask">
+    <view class="loading-spinner"></view>
+    <text class="loading-text">正在准备训练场</text>
+  </view>
+
+  <!-- 会话恢复模态框：用户中途退出后再次进入任务时 -->
+  <view wx:if="{{recoveryModalVisible}}" class="recovery-modal-mask" catchtap="onRecoveryCancel">
+    <view class="recovery-modal" catchtap="">
+      <view class="recovery-modal-icon">⏸</view>
+      <text class="recovery-modal-title">你有一个未完成的练习</text>
+      <text class="recovery-modal-desc">上次练习尚未正常结束，可继续上次进度，或结束后重新开始。</text>
+      <view class="recovery-modal-actions">
+        <button class="recovery-btn recovery-btn-primary" bindtap="onRecoveryResume" disabled="{{recoveryLoading}}">
+          继续练习
+        </button>
+        <button class="recovery-btn recovery-btn-secondary" bindtap="onRecoveryEndAndRestart" disabled="{{recoveryLoading}}" loading="{{recoveryLoading}}">
+          结束并重开
+        </button>
+      </view>
+      <text class="recovery-modal-cancel" bindtap="onRecoveryCancel">取消</text>
+    </view>
+  </view>
+</view>

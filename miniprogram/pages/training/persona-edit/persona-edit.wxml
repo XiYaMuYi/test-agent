@@ -1,0 +1,443 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="state-mask">
+    <view class="spinner"></view>
+    <text class="state-text">正在准备陪练…</text>
+  </view>
+
+  <block wx:else>
+    <view class="hero">
+      <text class="hero-title">配置你的模拟客户</text>
+      <text class="hero-sub">选择客户类型即可快速开始，也可展开精细自定义</text>
+    </view>
+
+    <!-- 第一步：客户类型 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-index">1</text>
+        <text class="section-title">客户类型</text>
+        <text class="section-hint">单选</text>
+      </view>
+      <view class="card-grid">
+        <view
+          wx:for="{{cards}}"
+          wx:key="id"
+          class="pick-card {{selectedCard === item.id ? 'pick-active' : ''}}"
+          bindtap="onSelectCard"
+          data-id="{{item.id}}"
+        >
+          <view class="pick-avatar">{{item.avatarText}}</view>
+          <text class="pick-name">{{item.name}}</text>
+          <text class="pick-sub">{{item.age}}岁 · {{item.occupation}}</text>
+        </view>
+      </view>
+      <view class="card-mode-toggle">
+        <text class="toggle-btn" bindtap="onToggleCardMode">{{cardMode === 'cohort' ? '使用经典年龄预设（小姐姐/御姐…）' : '返回 8 大人群选择'}}</text>
+      </view>
+    </view>
+
+    <!-- 第二步：心理倾向 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-index">2</text>
+        <text class="section-title">客户心理倾向</text>
+        <text class="section-hint">可多选，也可不选</text>
+      </view>
+      <view class="chip-wrap">
+        <view
+          wx:for="{{psychology}}"
+          wx:key="id"
+          class="chip {{item.selected ? 'chip-active' : ''}}"
+          bindtap="onTogglePsychology"
+          data-id="{{item.id}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 第三步：难度与场景 -->
+    <view class="section">
+      <view class="section-head">
+        <text class="section-index">3</text>
+        <text class="section-title">沟通难度</text>
+      </view>
+      <view class="chip-wrap">
+        <view
+          wx:for="{{difficulty}}"
+          wx:key="level"
+          class="chip chip-wide {{selectedDifficulty === item.level ? 'chip-active' : ''}}"
+          bindtap="onSelectDifficulty"
+          data-level="{{item.level}}"
+        >
+          <text class="chip-main">{{item.name}}</text>
+          <text class="chip-sub">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-head">
+        <text class="section-index">·</text>
+        <text class="section-title">产品场景</text>
+      </view>
+      <view class="chip-wrap">
+        <view
+          wx:for="{{scenarios}}"
+          wx:key="id"
+          class="chip {{selectedScenario === item.id ? 'chip-active' : ''}}"
+          bindtap="onSelectScenario"
+          data-id="{{item.id}}"
+        >{{item.name}}</view>
+      </view>
+    </view>
+
+    <!-- 更多自定义设置（默认折叠，不打断快速开始主路径） -->
+    <view class="section advanced-section">
+      <view class="advanced-toggle" bindtap="onToggleAdvanced">
+        <text class="advanced-toggle-title">更多自定义设置</text>
+        <text class="advanced-arrow">{{showAdvanced ? '收起 ▲' : '展开 ▼'}}</text>
+      </view>
+
+      <block wx:if="{{showAdvanced}}">
+        <view class="form-group">
+          <text class="form-label">客户背景</text>
+          <textarea
+            class="form-textarea"
+            placeholder="例如：35岁，最近发现细纹，预算有限，担心没效果，想先了解成分…"
+            value="{{backgroundText}}"
+            bindinput="onBackgroundInput"
+            auto-height
+            maxlength="300"
+          />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">补充备注</text>
+          <textarea
+            class="form-textarea"
+            placeholder="想让这位客户额外记住的信息（选填）"
+            value="{{notesText}}"
+            bindinput="onNotesInput"
+            auto-height
+            maxlength="300"
+          />
+        </view>
+
+        <view class="form-row">
+          <view class="form-item">
+            <text class="form-label">年龄</text>
+            <input class="form-input" type="number" placeholder="如 28" value="{{ageText}}" bindinput="onAgeInput" />
+          </view>
+          <view class="form-item">
+            <text class="form-label">职业</text>
+            <input class="form-input" placeholder="如 教师" value="{{occupationText}}" bindinput="onOccupationInput" />
+          </view>
+        </view>
+
+        <!-- T25 新增：性别 / 婚姻状况 / 收入水平 -->
+        <view class="form-group">
+          <text class="form-label">性别</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{genderOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{gender === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickGender"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">婚姻状况</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{maritalStatusOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{maritalStatus === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickMaritalStatus"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">收入水平</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{incomeLevelOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{incomeLevel === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickIncomeLevel"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <!-- v2 客户画像体系：客户定位 / 信任度 / 人群类型（P0，放在高级区最前） -->
+        <view class="form-group">
+          <text class="form-label">客户定位（生命周期阶段，选填）</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{customerRelationOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{customerRelation === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickCustomerRelation"
+            >{{opt.label}}</view>
+          </view>
+          <text class="form-tip">决定本次陪练的销售目标（破冰 / 首单 / 复购 / 升级）</text>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">信任度（1-5级，选填）</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{trustLevelOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{trustLevel === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickTrustLevel"
+            >{{opt.label}}</view>
+          </view>
+          <text class="form-tip">只影响客户话术与推进节奏，不影响评分</text>
+        </view>
+
+        <view class="form-row">
+          <view class="form-item">
+            <text class="form-label">所在城市</text>
+            <input class="form-input" placeholder="如 杭州" value="{{cityText}}" bindinput="onCityInput" maxlength="{{cityMaxLength}}" />
+          </view>
+          <view class="form-item">
+            <text class="form-label">经常购买品类</text>
+            <input class="form-input" placeholder="如 护肤精华" value="{{purchaseCategoryText}}" bindinput="onPurchaseCategoryInput" maxlength="{{purchaseCategoryMaxLength}}" />
+          </view>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label-line">
+            <text class="form-label">性格倾向</text>
+            <text class="form-link" bindtap="onResetTraits">恢复卡片默认</text>
+          </view>
+          <view class="trait" wx:for="{{traits}}" wx:key="key" wx:for-item="trait">
+            <text class="trait-label">{{trait.label}}</text>
+            <slider
+              class="trait-slider"
+              min="0"
+              max="100"
+              step="1"
+              value="{{trait.value}}"
+              show-value
+              data-key="{{trait.key}}"
+              bindchange="onTraitChange"
+              activeColor="#FF6B9D"
+              backgroundColor="#FFE3EE"
+              block-size="20"
+            />
+          </view>
+        </view>
+
+        <view class="form-row">
+          <view class="form-item">
+            <text class="form-label">预算下限（元）</text>
+            <input class="form-input" type="number" placeholder="100" value="{{budgetMinText}}" bindinput="onBudgetMinInput" />
+          </view>
+          <view class="form-item">
+            <text class="form-label">预算上限（元）</text>
+            <input class="form-input" type="number" placeholder="500" value="{{budgetMaxText}}" bindinput="onBudgetMaxInput" />
+          </view>
+        </view>
+
+        <!-- T25 新增：购买渠道 / 成分关注 / 竞品比较 -->
+        <view class="form-group">
+          <text class="form-label">购买渠道</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{purchaseChannelOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{purchaseChannel === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickPurchaseChannel"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">成分关注</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{ingredientFocusOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{ingredientFocus === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickIngredientFocus"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">竞品比较</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{competitorComparisonOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{competitorComparison === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickCompetitorComparison"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <!-- T25 新增：过敏史 / 在用产品 -->
+        <view class="form-group">
+          <text class="form-label">过敏史（多个请用逗号分隔）</text>
+          <input class="form-input" placeholder="如 酒精, 香精" value="{{allergiesText}}" bindinput="onAllergiesInput" />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">在用产品</text>
+          <input class="form-input" placeholder="如 SK-II 神仙水" value="{{currentProductsText}}" bindinput="onCurrentProductsInput" />
+        </view>
+
+        <!-- T25 新增：方言 -->
+        <view class="form-group">
+          <text class="form-label">方言</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{dialectOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{dialect === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickDialect"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">沟通风格</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{commStyleOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{commStyle === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickComm"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">表达详略</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{verbosityOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{verbosity === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickVerbosity"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">情绪外露程度</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{emotionOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{emotionLevel === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickEmotion"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <!-- T25 新增：口头禅 -->
+        <view class="form-group">
+          <text class="form-label">口头禅</text>
+          <input class="form-input" placeholder="如 这个我得考虑考虑" value="{{catchphraseText}}" bindinput="onCatchphraseInput" />
+        </view>
+
+        <view class="form-group">
+          <text class="form-label">肤质</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{skinOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{skinType === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickSkin"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <!-- v2 客户画像体系：皮肤问题专业词表多选 -->
+        <view class="form-group" wx:if="{{skinConcernGroups.length > 0}}">
+          <text class="form-label">皮肤问题（专业词表，可多选）</text>
+          <view class="concern-group" wx:for="{{skinConcernGroups}}" wx:key="category" wx:for-item="group">
+            <text class="concern-category">{{group.category}}</text>
+            <view class="concern-chips">
+              <view
+                wx:for="{{group.items}}"
+                wx:key="name"
+                wx:for-item="concern"
+                class="chip {{concern.selected ? 'chip-active' : ''}}"
+                data-group="{{group.category}}"
+                data-name="{{concern.name}}"
+                bindtap="onToggleSkinConcern"
+              >{{concern.name}}</view>
+            </view>
+          </view>
+        </view>
+
+        <!-- T25 新增：开场方式 -->
+        <view class="form-group">
+          <text class="form-label">开场方式</text>
+          <view class="seg-wrap">
+            <view
+              wx:for="{{openingModeOptions}}"
+              wx:key="value"
+              wx:for-item="opt"
+              class="seg {{openingMode === opt.value ? 'seg-active' : ''}}"
+              data-value="{{opt.value}}"
+              bindtap="onPickOpeningMode"
+            >{{opt.label}}</view>
+          </view>
+        </view>
+
+        <view class="form-row">
+          <view class="form-item">
+            <text class="form-label">最大对话轮数</text>
+            <input class="form-input" type="number" placeholder="15" value="{{maxTurnsText}}" bindinput="onMaxTurnsInput" />
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <!-- 模板名称（选填） -->
+    <view class="section">
+      <input
+        class="name-input"
+        placeholder="模板名称（选填，留空自动命名）"
+        value="{{templateName}}"
+        bindinput="onNameInput"
+      />
+    </view>
+
+    <view class="footer-actions">
+      <button class="btn-ghost" bindtap="onSaveTemplate" loading="{{saving}}" disabled="{{starting}}">存为我的模板</button>
+      <button class="btn-primary" bindtap="onStartPractice" loading="{{starting}}" disabled="{{saving}}">开始自由陪练</button>
+    </view>
+  </block>
+</view>

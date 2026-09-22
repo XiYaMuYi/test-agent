@@ -1,0 +1,100 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="state-mask">
+    <view class="spinner"></view>
+    <text class="state-text">正在为你匹配模拟客户…</text>
+  </view>
+
+  <block wx:else>
+    <view class="chat-header">
+      <view class="header-left">
+        <text class="turn-text">第 {{currentTurn}} 轮</text>
+        <view class="mood-tag {{customerMoodClass}}">
+          <text class="mood-label">客户情绪</text>
+          <text class="mood-value">{{customerMoodText}}</text>
+          <text wx:if="{{customerStatePending}}" class="mood-assessing">研判中…</text>
+        </view>
+      </view>
+      <view class="end-btn {{ending ? 'end-btn-disabled' : ''}}" bindtap="onEndPractice">结束练习</view>
+    </view>
+
+    <scroll-view class="chat-area" scroll-y scroll-into-view="{{scrollTarget}}" scroll-with-animation>
+      <view wx:if="{{messages.length === 0 && error}}" class="empty-error-card">
+        <view class="empty-error-icon">!</view>
+        <text class="empty-error-title">暂时没能开始练习</text>
+        <text class="empty-error-text">{{error.message}}</text>
+        <view class="empty-error-actions">
+          <view class="empty-btn secondary" bindtap="onBack">返回选择</view>
+          <view class="empty-btn primary" bindtap="onRetry">重新尝试</view>
+        </view>
+      </view>
+      <view wx:if="{{messages.length === 0 && !error && learnerFirst}}" class="learner-first-hint">
+        <view class="lfh-badge">本关由你先开口</view>
+        <text class="lfh-text">这位模拟客户不会主动打招呼，请你先向 TA 问好并开启话题。</text>
+      </view>
+      <view class="message msg-ai-wrap" wx:for="{{messages}}" wx:key="index" id="msg-{{index}}">
+        <view wx:if="{{item.role === 'user'}}" class="msg-row msg-row-user">
+          <view class="user-msg-col">
+            <view class="msg-bubble msg-user">{{item.content}}</view>
+            <view wx:if="{{item.coachFeedback || item.coachFeedbackPending}}" class="coach-card {{item.coachFeedbackExpanded ? 'coach-card-expanded' : ''}}">
+              <view class="coach-card-header" data-index="{{index}}" bindtap="onToggleCoachFeedback">
+                <text class="coach-card-title">{{item.coachFeedbackPending ? '教练正在复盘…' : '教练点评'}}</text>
+                <text wx:if="{{item.coachFeedback}}" class="coach-card-arrow">{{item.coachFeedbackExpanded ? '▲' : '▼'}}</text>
+              </view>
+              <view wx:if="{{item.coachFeedbackExpanded}}" class="coach-card-body">
+                <view wx:if="{{item.coachFeedback.rating !== undefined}}" class="coach-rating">
+                  <text class="coach-rating-label">表现评分</text>
+                  <view class="coach-rating-bar">
+                    <view class="coach-rating-fill" style="width: {{item.coachFeedback.rating}}%"></view>
+                  </view>
+                  <text class="coach-rating-value">{{item.coachFeedback.rating}}分</text>
+                </view>
+                <view wx:if="{{item.coachFeedback.feedback}}" class="coach-feedback-text">
+                  <text class="coach-feedback-label">点评</text>
+                  <text class="coach-feedback-content">{{item.coachFeedback.feedback}}</text>
+                </view>
+                <view wx:if="{{item.coachFeedback.improvements.length > 0}}" class="coach-improvements">
+                  <text class="coach-improvements-label">改进建议</text>
+                  <view wx:for="{{item.coachFeedback.improvements}}" wx:for-item="tip" wx:key="idx" class="coach-improvement-item">
+                    <text class="coach-improvement-dot">•</text>
+                    <text class="coach-improvement-text">{{tip}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+          <view class="avatar avatar-me">我</view>
+        </view>
+        <view wx:else class="msg-row">
+          <view class="avatar avatar-customer">客</view>
+          <view class="msg-bubble msg-ai">{{item.content}}</view>
+        </view>
+      </view>
+
+      <view wx:if="{{isTyping}}" class="msg-row">
+        <view class="avatar avatar-customer">客</view>
+        <view class="msg-bubble msg-ai typing"><text class="dots">● ● ●</text></view>
+      </view>
+      <view id="bottom" class="chat-bottom"></view>
+    </scroll-view>
+
+    <view wx:if="{{error && messages.length > 0}}" class="error-bar">
+      <text class="error-text">{{error.message}}</text>
+      <text class="error-retry" bindtap="onRetry">重试</text>
+    </view>
+
+    <view class="input-area">
+      <textarea
+        class="msg-input"
+        placeholder="作为主播，回复你的客户…"
+        value="{{inputText}}"
+        bindinput="onInputChange"
+        bindkeyboardheightchange="onKeyboardHeightChange"
+        auto-height
+        maxlength="800"
+        adjust-position="true"
+        disabled="{{isTyping || !active}}"
+      ></textarea>
+      <view class="send-btn {{inputText && !isTyping && active ? 'active' : ''}}" bindtap="onSend">发送</view>
+    </view>
+  </block>
+</view>

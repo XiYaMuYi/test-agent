@@ -1,0 +1,371 @@
+.container {
+  /* 底部留白需 ≥ 固定操作栏高度(88rpx+上下padding+安全区)，避免最后内容被遮挡 */
+  padding: 24rpx 28rpx calc(220rpx + env(safe-area-inset-bottom));
+  background: #f6f6f9;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.hero {
+  padding: 20rpx 8rpx 24rpx;
+}
+.hero-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 700;
+  color: #222;
+}
+.hero-sub {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: #999;
+}
+
+.section {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 18rpx rgba(0, 0, 0, 0.04);
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 22rpx;
+}
+.section-index {
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff6b9d, #ff8e53);
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 700;
+  margin-right: 14rpx;
+}
+.section-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #222;
+  flex: 1;
+}
+.section-hint {
+  font-size: 22rpx;
+  color: #bbb;
+}
+
+/* 客户类型卡片 */
+.card-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+.pick-card {
+  width: calc(33.33% - 10rpx);
+  background: linear-gradient(160deg, #faf9f7, #f5f3f0);
+  border: 2rpx solid transparent;
+  border-radius: 18rpx;
+  padding: 24rpx 10rpx 20rpx;
+  text-align: center;
+  box-sizing: border-box;
+  transition: all 0.18s ease;
+  box-shadow: 0 3rpx 10rpx rgba(45,43,40,.05);
+}
+.pick-card:active { opacity: .82; transform: scale(.96); }
+.pick-active {
+  background: #fff7f2;
+  border-color: #c8795f;
+  box-shadow: 0 6rpx 18rpx rgba(174,103,76,.2);
+  transform: translateY(-2rpx);
+}
+.pick-avatar {
+  font-size: 48rpx;
+  line-height: 1;
+  margin-bottom: 12rpx;
+  filter: drop-shadow(0 2rpx 4rpx rgba(0,0,0,.08));
+}
+.pick-active .pick-avatar {
+  filter: drop-shadow(0 2rpx 6rpx rgba(174,103,76,.15));
+}
+.pick-name {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #1d2024;
+}
+.pick-sub {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 19rpx;
+  color: #8a8d90;
+  line-height: 1.3;
+}
+
+/* 方案 B：客户类型切换按钮 */
+.card-mode-toggle {
+  margin-top: 20rpx;
+  text-align: center;
+}
+.toggle-btn {
+  display: inline-block;
+  font-size: 24rpx;
+  color: #999;
+  padding: 12rpx 28rpx;
+  border: 2rpx dashed #e0e0e0;
+  border-radius: 32rpx;
+  background: transparent;
+}
+.toggle-btn:active {
+  color: #ff6b9d;
+  border-color: #ff6b9d;
+  background: #fff3f8;
+}
+
+/* 选择胶囊 */
+.chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.chip {
+  padding: 14rpx 28rpx;
+  border-radius: 999rpx;
+  background: #f3f4f7;
+  color: #555;
+  font-size: 26rpx;
+  border: 2rpx solid transparent;
+}
+.chip-active {
+  background: #fff3f8;
+  color: #ff4f93;
+  border-color: #ff6b9d;
+  font-weight: 600;
+}
+.chip-wide {
+  width: calc(50% - 8rpx);
+  border-radius: 16rpx;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18rpx 22rpx;
+}
+.chip-main {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.chip-sub {
+  margin-top: 6rpx;
+  font-size: 20rpx;
+  color: #aaa;
+  line-height: 1.4;
+}
+.chip-active .chip-sub {
+  color: #ff8fb5;
+}
+
+.name-input {
+  background: #f7f7fa;
+  border-radius: 14rpx;
+  padding: 22rpx 24rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.footer-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 28rpx calc(28rpx + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+.btn-ghost,
+.btn-primary {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 999rpx;
+  font-size: 28rpx;
+  margin: 0;
+  line-height: 88rpx;
+  height: 88rpx;
+  padding: 0 12rpx;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* 去除微信原生 button 默认边框，避免挤压文字 */
+.btn-ghost::after,
+.btn-primary::after {
+  border: none;
+}
+.btn-ghost {
+  background: #f3f4f7;
+  color: #666;
+}
+.btn-primary {
+  flex: 1.5;
+  background: linear-gradient(135deg, #ff6b9d, #ff8e53);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 8rpx 20rpx rgba(255, 107, 157, 0.32);
+}
+.btn-primary[disabled],
+.btn-ghost[disabled] {
+  opacity: 0.6;
+}
+
+.state-mask {
+  padding-top: 200rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.spinner {
+  width: 64rpx;
+  height: 64rpx;
+  border: 6rpx solid #ffe3ee;
+  border-top-color: #ff6b9d;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.state-text {
+  margin-top: 20rpx;
+  color: #999;
+  font-size: 26rpx;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- 更多自定义设置 ---------- */
+.advanced-section {
+  padding-top: 0;
+  overflow: hidden;
+}
+.advanced-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 24rpx;
+  margin: 0 -24rpx;
+}
+.advanced-toggle-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #ff6b9d;
+}
+.advanced-arrow {
+  font-size: 24rpx;
+  color: #ff6b9d;
+}
+
+.form-group {
+  margin-top: 24rpx;
+}
+.form-label {
+  display: block;
+  font-size: 26rpx;
+  color: #555;
+  font-weight: 600;
+  margin-bottom: 14rpx;
+}
+.form-tip {
+  display: block;
+  font-size: 22rpx;
+  color: #999;
+  margin-top: 10rpx;
+}
+.concern-group {
+  margin-top: 16rpx;
+}
+.concern-category {
+  display: block;
+  font-size: 24rpx;
+  color: #888;
+  margin-bottom: 10rpx;
+}
+.concern-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.form-label-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-label-line .form-label {
+  margin-bottom: 0;
+}
+.form-link {
+  font-size: 24rpx;
+  color: #ff6b9d;
+}
+.form-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 96rpx;
+  padding: 18rpx 20rpx;
+  background: #f7f7fa;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  color: #333;
+  line-height: 1.5;
+}
+.form-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 24rpx;
+}
+.form-item {
+  flex: 1;
+}
+.form-input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 80rpx;
+  padding: 0 20rpx;
+  background: #f7f7fa;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.trait {
+  margin-top: 8rpx;
+}
+.trait-label {
+  font-size: 24rpx;
+  color: #777;
+}
+.trait-slider {
+  margin: 0;
+  padding: 6rpx 0 0;
+}
+
+.seg-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+.seg {
+  padding: 12rpx 28rpx;
+  border-radius: 999rpx;
+  background: #f4f4f8;
+  font-size: 25rpx;
+  color: #666;
+}
+.seg-active {
+  background: linear-gradient(135deg, #ff6b9d, #ff8e53);
+  color: #fff;
+  font-weight: 600;
+}

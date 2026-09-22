@@ -1,0 +1,124 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="state-mask">
+    <view class="spinner"></view>
+    <text class="state-text">正在生成本场评估报告…</text>
+  </view>
+
+  <view wx:elif="{{error}}" class="state-mask">
+    <text class="state-text">{{error.message}}</text>
+    <view class="btn-primary small" bindtap="onRetry">重试</view>
+  </view>
+
+  <block wx:elif="{{evaluation}}">
+    <view class="score-card">
+      <view class="score-ring tone-{{gradeTone}}">
+        <view class="score-value">
+          <text class="score-num">{{evaluation.score}}</text>
+          <text class="score-unit">分</text>
+        </view>
+      </view>
+      <view class="grade-badge tone-{{gradeTone}}">{{gradeLabel}}</view>
+      <!-- T32.2：客户情绪展示（不同情绪使用不同颜色） -->
+      <view class="mood-tag mood-{{customerMoodTone}}">
+        <text class="mood-label">客户情绪</text>
+        <text class="mood-value">{{customerMoodText}}</text>
+      </view>
+      <text class="turns-text">本场对话 {{evaluation.messageCount}} 轮</text>
+      <view class="stage-chip" wx:if="{{customerStageText}}">
+        <text class="stage-label">客户研判</text>
+        <text class="stage-value">{{customerStageText}}</text>
+      </view>
+    </view>
+
+    <!-- 私域能力模型（新 8 维，随客户阶段自适应，含不适用与评分理由） -->
+    <view class="section" wx:if="{{useCustomModel}}">
+      <text class="section-title">能力评分</text>
+      <view class="cdim-card {{item.applicable ? '' : 'is-na'}}" wx:for="{{customDimensions}}" wx:key="key">
+        <view class="cdim-head">
+          <text class="dim-label">{{item.name}}</text>
+          <text class="cdim-grade grade-{{item.gradeTone}}">{{item.applicable ? item.score + '分 · ' + item.gradeLabel : '本阶段不适用'}}</text>
+        </view>
+        <view class="dim-track" wx:if="{{item.applicable}}">
+          <view class="dim-fill" style="width: {{item.score}}%"></view>
+        </view>
+        <text class="cdim-reason" wx:if="{{item.reason}}">{{item.reason}}</text>
+      </view>
+    </view>
+
+    <!-- 旧五维（后端未升级时回退展示） -->
+    <view class="section" wx:elif="{{dimensions.length > 0}}">
+      <text class="section-title">五维评分</text>
+      <view class="dim-item" wx:for="{{dimensions}}" wx:key="key">
+        <text class="dim-label">{{item.name}}</text>
+        <view class="dim-track">
+          <view class="dim-fill" style="width: {{item.score}}%"></view>
+        </view>
+        <text class="dim-score">{{item.score}}</text>
+      </view>
+    </view>
+
+    <!-- 产品事实 / 安全红线提醒（乱描述、乱推荐、踩禁忌、虚假承诺） -->
+    <view class="section warn-section" wx:if="{{knowledgeWarnings.length > 0}}">
+      <text class="section-title warn-title">产品与安全提醒</text>
+      <view class="warn-item" wx:for="{{knowledgeWarnings}}" wx:key="*this">
+        <text class="warn-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{capabilityDimensions.length > 0}}">
+      <text class="section-title">顾问能力评分</text>
+      <view class="dim-item" wx:for="{{capabilityDimensions}}" wx:key="key">
+        <text class="dim-label">{{item.name}}</text><text class="dim-score">{{item.score}}</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{stateTrends.length > 0}}">
+      <text class="section-title">客户状态变化</text>
+      <view class="dim-item" wx:for="{{stateTrends}}" wx:key="key">
+        <text class="dim-label">{{item.label}}</text><text class="dim-score">{{item.initial}} → {{item.final}}</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{turnEvidence.length > 0}}">
+      <text class="section-title">逐轮证据</text>
+      <view class="suggest-item" wx:for="{{turnEvidence}}" wx:for-item="turn" wx:key="index">
+        <text class="suggest-text">第{{turn.sequence}}轮：{{turn.dimensionLabel}} {{turn.reason}}</text>
+      </view>
+    </view>
+    <view class="section" wx:if="{{endReasonText}}"><text class="section-title">结束原因</text><text class="tip-text">{{endReasonText}}</text></view>
+
+    <view class="section highlight-section" wx:if="{{highlights.length > 0}}">
+      <text class="section-title highlight-title">亮点</text>
+      <view class="highlight-item" wx:for="{{highlights}}" wx:key="*this">
+        <text class="highlight-icon">✓</text>
+        <text class="highlight-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section improve-section" wx:if="{{improvements.length > 0}}">
+      <text class="section-title improve-title">改进建议</text>
+      <view class="improve-item" wx:for="{{improvements}}" wx:key="*this">
+        <text class="improve-icon">↑</text>
+        <text class="improve-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{suggestions.length > 0}}">
+      <text class="section-title">点评建议</text>
+      <view class="suggest-item" wx:for="{{suggestions}}" wx:key="*this">
+        <text class="dot">·</text>
+        <text class="suggest-text">{{item}}</text>
+      </view>
+    </view>
+
+    <view class="section tip-card" wx:else>
+      <text class="tip-title">练习建议</text>
+      <text class="tip-text">多练几组不同客户类型与难度，系统会逐步沉淀你的能力画像。</text>
+    </view>
+
+    <button class="replay-link" bindtap="onViewConversation">查看完整对话回放</button>
+
+    <view class="footer-actions">
+      <button class="btn-ghost" bindtap="onBack">返回主页</button>
+      <button class="btn-primary" bindtap="onRetry">再练一次</button>
+    </view>
+  </block>
+</view>

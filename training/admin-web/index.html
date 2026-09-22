@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>神首公主购陪练系统 · 管理端</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { AdminApplication, AdminApiClient, mountAdminApplication } from './app.js';
+
+    // 本地开发固定管理员令牌；生产由登录态注入，勿在此硬编码真实凭证。
+    const ADMIN_TOKEN = 'fixture:identity:admin-organization-a';
+    const fetcher = async (path, init) => {
+      const headers = { ...(init?.headers ?? {}), 'x-access-token': ADMIN_TOKEN };
+      const response = await fetch(path, { ...init, headers });
+      return { ok: response.ok, status: response.status, json: () => response.json() };
+    };
+
+    const client = new AdminApiClient(fetcher);
+    const application = new AdminApplication(client);
+    mountAdminApplication(document.getElementById('app'), application);
+  </script>
+</body>
+</html>

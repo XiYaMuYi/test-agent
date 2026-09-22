@@ -1,0 +1,5 @@
+packages:
+  - api
+  - worker
+  - contracts
+  - test-fixtures

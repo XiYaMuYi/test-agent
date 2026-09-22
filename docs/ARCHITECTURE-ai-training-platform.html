@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>AI 陪练平台技术架构图</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"PingFang SC","Microsoft YaHei",sans-serif; background:#f5f7fa; padding:32px; color:#1f2937; }
+  h1 { font-size:22px; margin-bottom:4px; }
+  .sub { color:#6b7280; font-size:13px; margin-bottom:24px; }
+  .layer { background:#fff; border-radius:12px; padding:18px 20px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .layer-title { font-size:13px; font-weight:600; color:#fff; display:inline-block; padding:3px 12px; border-radius:20px; margin-bottom:14px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; }
+  .box { flex:1; min-width:150px; border:1.5px solid #e5e7eb; border-radius:10px; padding:12px 14px; background:#fafbfc; }
+  .box .name { font-size:14px; font-weight:600; margin-bottom:4px; }
+  .box .desc { font-size:12px; color:#6b7280; line-height:1.5; }
+  .arrow { text-align:center; color:#9ca3af; font-size:18px; margin:6px 0; }
+  .l-access .layer-title { background:#6366f1; }
+  .l-edge .layer-title { background:#0ea5e9; }
+  .l-svc .layer-title { background:#10b981; }
+  .l-data .layer-title { background:#f59e0b; }
+  .l-ext .layer-title { background:#8b5cf6; }
+  .tag { display:inline-block; font-size:11px; background:#eef2ff; color:#4f46e5; padding:1px 7px; border-radius:10px; margin-top:6px; }
+</style>
+</head>
+<body>
+<h1>AI 陪练平台 · 技术架构图</h1>
+<div class="sub">公主购 · 双端（小程序 C 端 + Web B 端）· Docker 部署 · 2026-09-22</div>
+
+<div class="layer l-access">
+  <div class="layer-title">接入层 · 用户端</div>
+  <div class="row">
+    <div class="box">
+      <div class="name">小程序 C 端</div>
+      <div class="desc">pages/training<br>陪练工作台/对话/复盘/我的任务</div>
+      <span class="tag">原生微信小程序</span>
+    </div>
+    <div class="box">
+      <div class="name">Web B 端</div>
+      <div class="desc">admin-web 静态页<br>模板/任务/评分/知识库/学员档案</div>
+      <span class="tag">HTML/CSS/JS</span>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">▼ HTTPS（签名 + x-token 请求头）</div>
+
+<div class="layer l-edge">
+  <div class="layer-title">边界层 · 公网与内网穿透</div>
+  <div class="row">
+    <div class="box">
+      <div class="name">阿里云公网域名</div>
+      <div class="desc">train.xiaohongquanliang.com<br>443 Nginx 反代 + HTTPS</div>
+    </div>
+    <div class="box">
+      <div class="name">内网穿透</div>
+      <div class="desc">公网 → 内网 192.168.107.13</div>
+    </div>
+    <div class="box">
+      <div class="name">B 端入口</div>
+      <div class="desc">:18080 → admin-web 容器</div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">▼</div>
+
+<div class="layer l-svc">
+  <div class="layer-title">服务层 · Docker Compose（内网）</div>
+  <div class="row">
+    <div class="box">
+      <div class="name">API（NestJS）</div>
+      <div class="desc">sessions / conversations / assignments<br>scenarios / templates / persona / scoring<br>evaluations / knowledge / learners / identity</div>
+      <span class="tag">:18001→3000</span>
+    </div>
+    <div class="box">
+      <div class="name">Worker（异步）</div>
+      <div class="desc">LLM 评分 / 客户情绪研判<br>结果报告生成</div>
+      <span class="tag">不阻塞主对话</span>
+    </div>
+    <div class="box">
+      <div class="name">PrincipalGuard 鉴权</div>
+      <div class="desc">校验登录态 · 挂 CurrentPrincipal<br>昵称/头像头解析</div>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">▼</div>
+
+<div class="layer l-data">
+  <div class="layer-title">数据层</div>
+  <div class="row">
+    <div class="box">
+      <div class="name">PostgreSQL</div>
+      <div class="desc">learner_profile（JSONB 画像/维度分）<br>评分维度/模板/关联/知识库/任务/会话</div>
+      <span class="tag">迁移 0019~0026</span>
+    </div>
+  </div>
+</div>
+
+<div class="arrow">▼</div>
+
+<div class="layer l-ext">
+  <div class="layer-title">外部依赖</div>
+  <div class="row">
+    <div class="box">
+      <div class="name">公主购主站网关</div>
+      <div class="desc">rapi.gongzhugou.vip<br>登录态校验 customer/info/get</div>
+    </div>
+    <div class="box">
+      <div class="name">LLM 模型供应商</div>
+      <div class="desc">对话/评分/情绪<br>密钥走环境变量</div>
+    </div>
+    <div class="box">
+      <div class="name">外部知识库（可选）</div>
+      <div class="desc">RAG 产品知识片段</div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

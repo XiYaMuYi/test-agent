@@ -1,0 +1,43 @@
+{
+  "name": "@training/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@nestjs/common": "^11.1.8",
+    "@nestjs/core": "^11.1.8",
+    "@nestjs/platform-express": "^11.1.8",
+    "@training/contracts": "workspace:*",
+    "@training/test-fixtures": "workspace:*",
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "description": "神首公主购陪练 API 的 G1 本地骨架。",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "pnpm run build && node --watch dist/main.js",
+    "start": "node dist/main.js",
+    "start:env": "node --env-file=.env dist/main.js",
+    "dev:env": "pnpm run build && node --env-file=.env --watch dist/main.js",
+    "lint": "eslint src/ --ext .ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "corepack pnpm --filter @training/worker run build && corepack pnpm run build && tsc -p tsconfig.test.json && node --test test-dist/test/**/*.test.js && node --test --test-concurrency=1 test-dist/test/**/*.e2e-spec.js && node --test test/database/migrations.test.mjs",
+    "test:e2e": "corepack pnpm --filter @training/worker run build && corepack pnpm run build && tsc -p tsconfig.test.json && node --test --test-concurrency=1 test-dist/test/**/*.e2e-spec.js",
+    "test:integration": "corepack pnpm --filter @training/worker run build && corepack pnpm run build && tsc -p tsconfig.test.json && node --test --test-concurrency=1 test-dist/test/**/*.integration.js",
+    "migrate:up": "corepack pnpm run build && node dist/database/migrate.js",
+    "migrate:down": "corepack pnpm run build && node dist/database/migrate.js --down",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\""
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.8",
+    "@testcontainers/postgresql": "10.16.0",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.2",
+    "supertest": "^7.0.0",
+    "testcontainers": "10.16.0"
+  }
+}

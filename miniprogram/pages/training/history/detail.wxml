@@ -1,0 +1,78 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="state-mask">
+    <view class="spinner"></view>
+    <text class="state-text">加载回放…</text>
+  </view>
+
+  <view wx:elif="{{error}}" class="state-mask">
+    <text class="state-text">{{error.message}}</text>
+    <view class="btn-line" bindtap="onRetry">重试</view>
+  </view>
+
+  <block wx:else>
+    <view class="summary">
+      <view class="summary-left">
+        <text class="summary-title">练习回放</text>
+        <text class="summary-sub">共 {{messages.length / 2}} 轮对话</text>
+      </view>
+      <view class="summary-right">
+        <view class="mood-tag {{overallMoodClass}}" wx:if="{{overallMood}}">
+          <text class="mood-label">客户情绪</text>
+          <text class="mood-value">{{overallMoodText}}</text>
+        </view>
+        <view class="score-chip" wx:if="{{score !== null}}">
+          <text class="score-num">{{score}}</text>
+          <text class="score-grade">{{gradeText}}</text>
+        </view>
+        <view class="score-chip pending" wx:else>
+          <text class="score-grade">{{gradeText}}</text>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view class="replay" scroll-y>
+      <view wx:for="{{messages}}" wx:key="index" class="msg-row {{item.role === 'user' ? 'msg-row-user' : ''}}">
+        <view wx:if="{{item.role === 'user'}}" class="user-msg-col">
+          <view class="bubble bubble-me">{{item.content}}</view>
+          <!-- T32.3：逐轮客户情绪标签 -->
+          <view wx:if="{{item.hasCustomerMood}}" class="turn-mood-tag {{item.customerMoodClass}}">
+            <text class="turn-mood-label">客户情绪</text>
+            <text class="turn-mood-value">{{item.customerMoodText}}</text>
+          </view>
+          <!-- T32.3：逐轮教练点评卡片（可折叠） -->
+          <view wx:if="{{item.hasCoachFeedback}}" class="coach-card {{item.coachFeedbackExpanded ? 'coach-card-expanded' : ''}}">
+            <view class="coach-card-header" data-index="{{index}}" bindtap="onToggleCoachFeedback">
+              <text class="coach-card-title">教练点评</text>
+              <text class="coach-card-arrow">{{item.coachFeedbackExpanded ? '▲' : '▼'}}</text>
+            </view>
+            <view wx:if="{{item.coachFeedbackExpanded}}" class="coach-card-body">
+              <view wx:if="{{item.coachFeedback.rating !== null}}" class="coach-rating">
+                <text class="coach-rating-label">表现评分</text>
+                <view class="coach-rating-bar">
+                  <view class="coach-rating-fill" style="width: {{item.coachFeedback.rating}}%"></view>
+                </view>
+                <text class="coach-rating-value">{{item.coachFeedback.rating}}分</text>
+              </view>
+              <view wx:if="{{item.coachFeedback.feedback}}" class="coach-feedback-text">
+                <text class="coach-feedback-label">点评</text>
+                <text class="coach-feedback-content">{{item.coachFeedback.feedback}}</text>
+              </view>
+              <view wx:if="{{item.coachFeedback.improvements.length > 0}}" class="coach-improvements">
+                <text class="coach-improvements-label">改进建议</text>
+                <view wx:for="{{item.coachFeedback.improvements}}" wx:for-item="tip" wx:key="idx" class="coach-improvement-item">
+                  <text class="coach-improvement-dot">•</text>
+                  <text class="coach-improvement-text">{{tip}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        <view wx:else class="bubble-left">
+          <view class="avatar">客</view>
+          <view class="bubble bubble-customer">{{item.content}}</view>
+        </view>
+      </view>
+      <view class="replay-end">— 练习已结束 —</view>
+    </scroll-view>
+  </block>
+</view>

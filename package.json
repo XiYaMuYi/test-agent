@@ -1,0 +1,12 @@
+{
+  "name": "@gongzhugou/training",
+  "private": true,
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "pnpm --filter @training/contracts run build && pnpm --filter @training/test-fixtures run build && pnpm --filter @training/api run build && pnpm --filter @training/worker run build",
+    "test": "pnpm --filter @training/contracts run test && pnpm --filter @training/test-fixtures run test && pnpm --filter @training/worker run test && pnpm --filter @training/api run test"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

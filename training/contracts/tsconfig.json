@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    // HttpModelAdapter relies on the WHATWG globals fetch/AbortSignal, which
+    // Node also implements at runtime. Pull in the DOM typings so this package
+    // builds standalone (clean checkout / CI) without a Node types dependency.
+    "lib": ["ES2022", "DOM"]
+  },
+  "include": ["src/**/*.ts"]
+}
