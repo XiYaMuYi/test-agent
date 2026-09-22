@@ -1,22 +1,7 @@
 # AI 陪练平台 · 学习指引（Learning Guide）
 
 > 面向想克隆本仓库、理解一个 AI 产品从 0 到 1 怎么做的学习者。
-> 不按职位，按思维维度分层：产品思维 → 领域建模 → AI 嵌入/提示词工程 → 前后端架构 → 异步工程 → B 端产品。
-
----
-
-## 代码量概览
-
-| 模块 | 文件 | 行数 | 学什么 |
-|---|---|---|---|
-| contracts（共享契约） | 19 | ~2,100 | 领域建模 |
-| api（NestJS 后端） | 100 | ~11,200 | 业务/架构 |
-| worker（异步） | 14 | ~2,800 | 工程化 |
-| admin-web（B 端） | 13 | ~5,700 | 全栈/运营产品 |
-| miniprogram/pages | 18 | ~4,000 | 小程序端 |
-| utils | 2 | ~340 | 基础设施 |
-| test（测试） | 63 | ~9,200 | 工程质量 |
-| **合计** | ~230 | **~35,000** | — |
+> 不按职位，按思维维度分层：产品思维 → 领域建模 → AI 嵌入/提示词工程 → 前后端架构 → 异步工程 → B 端产品 → 部署运维。
 
 ---
 
@@ -62,6 +47,15 @@
 
 ### 第 6 步：测试思维 — 选读
 - `training/api/test/` — contracts/集成/e2e 分层测试
+
+### 第 7 步：部署与运维（Docker / 配置 / 上线）— 半天
+- `docker-compose.yml` — **重点**：四服务（api/worker/postgres/admin-web）如何编排、依赖关系、端口映射
+- `training/api/Dockerfile`、`training/worker/Dockerfile` — 后端镜像怎么构建
+- `training/api/.env.example` — **重点**：所有外部依赖（LLM 供应商、知识库、鉴权、DB）如何通过环境变量注入，做到代码无密钥
+- `deploy/README.md` — 从 clone 到启动的完整步骤
+- `training/api/src/adapters/` 的 fake 实现 — 理解"本地无密钥也能跑全流程"的设计
+
+**核心体会**：配置与代码分离、接口多实现（fake/http/weknora）、本地与生产一套代码靠环境变量切换。
 
 ---
 
